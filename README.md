@@ -1,5 +1,8 @@
 # fp_micropython
 > Base on ESP32
+## Hardware Requirements
+- [Adafruit MLX90640](https://www.adafruit.com/product/4407)
+- [Adafruit ST7735R](https://www.adafruit.com/product/358)
 ## Firmware Download
 - [ESP32 Firmware](https://micropython.org/resources/firmware/esp32-20220618-v1.19.1.bin)
 ## Firmware Installation Instructions
