@@ -1,31 +1,8 @@
-# SPDX-FileCopyrightText: 2019 ladyada for Adafruit Industries
-#
-# SPDX-License-Identifier: MIT
-
-"""
-`adafruit_mlx90640`
-================================================================================
-
-Driver for the MLX90640 thermal camera
-
-
-* Author(s): ladyada
-
-Implementation Notes
---------------------
-
-**Software and Dependencies:**
-
-* Adafruit CircuitPython firmware for the supported boards:
-  https://github.com/adafruit/circuitpython/releases
-* Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
-* Adafruit's Register library: https://github.com/adafruit/Adafruit_CircuitPython_Register
-"""
-
 import struct
 import math
 import time
-from adafruit_bus_device.i2c_device import I2CDevice
+from machine import I2C
+import gc
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_MLX90640.git"
@@ -84,8 +61,13 @@ class MLX90640:  # pylint: disable=too-many-instance-attributes
     cpKta = 0
     cpKv = 0
 
+    device_address = 0x33
+    i2c_device: I2C
+    inbuf = memoryview(bytearray(I2C_READ_LEN*2))
+
     def __init__(self, i2c_bus, address=0x33):
-        self.i2c_device = I2CDevice(i2c_bus, address)
+        self.device_address = address
+        self.i2c_device = i2c_bus
         self._I2CReadWords(0x2400, eeData)
         # print(eeData)
         self._ExtractParameters()
@@ -151,8 +133,7 @@ class MLX90640:  # pylint: disable=too-many-instance-attributes
             # print("frame ready: 0x%x" % dataReady)
             cnt += 1
 
-        if cnt > 4:
-            raise RuntimeError("Too many retries")
+        if cnt > 4: raise RuntimeError("Too many retries")
 
         self._I2CReadWords(0x800D, controlRegister)
         frameData[832] = controlRegister[0]
@@ -163,12 +144,10 @@ class MLX90640:  # pylint: disable=too-many-instance-attributes
         vdd = self._GetVdd(frameData)
 
         ptat = frameData[800]
-        if ptat > 32767:
-            ptat -= 65536
+        if ptat > 32767: ptat -= 65536
 
         ptatArt = frameData[768]
-        if ptatArt > 32767:
-            ptatArt -= 65536
+        if ptatArt > 32767: ptatArt -= 65536
         ptatArt = (ptat / (ptat * self.alphaPTAT + ptatArt)) * math.pow(2, 18)
 
         ta = ptatArt / (1 + self.KvPTAT * (vdd - 3.3)) - self.vPTAT25
@@ -216,8 +195,7 @@ class MLX90640:  # pylint: disable=too-many-instance-attributes
 
         # --------- Gain calculation -----------------------------------
         gain = frameData[778]
-        if gain > 32767:
-            gain -= 65536
+        if gain > 32767: gain -= 65536
         gain = self.gainEE / gain
 
         # --------- To calculation -------------------------------------
@@ -226,27 +204,13 @@ class MLX90640:  # pylint: disable=too-many-instance-attributes
         irDataCP[0] = frameData[776]
         irDataCP[1] = frameData[808]
         for i in range(2):
-            if irDataCP[i] > 32767:
-                irDataCP[i] -= 65536
+            if irDataCP[i] > 32767: irDataCP[i] -= 65536
             irDataCP[i] *= gain
 
-        irDataCP[0] -= (
-            self.cpOffset[0]
-            * (1 + self.cpKta * (ta - 25))
-            * (1 + self.cpKv * (vdd - 3.3))
-        )
-        if mode == self.calibrationModeEE:
-            irDataCP[1] -= (
-                self.cpOffset[1]
-                * (1 + self.cpKta * (ta - 25))
-                * (1 + self.cpKv * (vdd - 3.3))
-            )
-        else:
-            irDataCP[1] -= (
-                (self.cpOffset[1] + self.ilChessC[0])
-                * (1 + self.cpKta * (ta - 25))
-                * (1 + self.cpKv * (vdd - 3.3))
-            )
+        irDataCP[0] -= (self.cpOffset[0] * (1 + self.cpKta * (ta - 25)) * (1 + self.cpKv * (vdd - 3.3)))
+        
+        if mode == self.calibrationModeEE: irDataCP[1] -= (self.cpOffset[1] * (1 + self.cpKta * (ta - 25)) * (1 + self.cpKv * (vdd - 3.3)))
+        else: irDataCP[1] -= ((self.cpOffset[1] + self.ilChessC[0]) * (1 + self.cpKta * (ta - 25)) * (1 + self.cpKv * (vdd - 3.3)))
 
         for pixelNumber in range(768):
             if self._IsPixelBad(pixelNumber):
@@ -256,12 +220,7 @@ class MLX90640:  # pylint: disable=too-many-instance-attributes
 
             ilPattern = pixelNumber // 32 - (pixelNumber // 64) * 2
             chessPattern = ilPattern ^ (pixelNumber - (pixelNumber // 2) * 2)
-            conversionPattern = (
-                (pixelNumber + 2) // 4
-                - (pixelNumber + 3) // 4
-                + (pixelNumber + 1) // 4
-                - pixelNumber // 4
-            ) * (1 - 2 * ilPattern)
+            conversionPattern = ((pixelNumber + 2) // 4 - (pixelNumber + 3) // 4 + (pixelNumber + 1) // 4 - pixelNumber // 4) * (1 - 2 * ilPattern)
 
             if mode == 0:
                 pattern = ilPattern
@@ -322,7 +281,7 @@ class MLX90640:  # pylint: disable=too-many-instance-attributes
                 else:
                     torange = 3
 
-                To = (
+                To = int(
                     math.sqrt(
                         math.sqrt(
                             irData
@@ -801,8 +760,7 @@ class MLX90640:  # pylint: disable=too-many-instance-attributes
         cmd[3] = data & 0x00FF
         dataCheck = [0]
 
-        with self.i2c_device as i2c:
-            i2c.write(cmd)
+        self.i2c_device.writeto(self.device_address, cmd)
         # print("Wrote:", [hex(i) for i in cmd])
         time.sleep(0.001)
         self._I2CReadWords(writeAddress, dataCheck)
@@ -818,25 +776,36 @@ class MLX90640:  # pylint: disable=too-many-instance-attributes
             remainingWords = end
         offset = 0
         addrbuf = bytearray(2)
-        inbuf = bytearray(2 * I2C_READ_LEN)
 
-        with self.i2c_device as i2c:
-            while remainingWords:
-                addrbuf[0] = addr >> 8  # MSB
-                addrbuf[1] = addr & 0xFF  # LSB
-                read_words = min(remainingWords, I2C_READ_LEN)
-                i2c.write_then_readinto(
-                    addrbuf, inbuf, in_end=read_words * 2
-                )  # in bytes
-                # print("-> ", [hex(i) for i in addrbuf])
+        while remainingWords:
+            addrbuf[0] = addr >> 8  # MSB
+            addrbuf[1] = addr & 0xFF  # LSB
+            read_words = min(remainingWords, I2C_READ_LEN)
+            # self.i2c_device.writeto(self.device_address, addrbuf)
+            self.i2c_device.readfrom_mem_into(self.device_address, addr, self.inbuf[0:read_words*2], addrsize=16)
+            # print("-> ", [hex(i) for i in addrbuf])
+            
+            temp = read_words//10
+            temps = [0]
+            for i in range(9):
+                temps.append(temps[i]+temp*2)
+            
+            for i in range(9):
                 outwords = struct.unpack(
-                    ">" + "H" * read_words, inbuf[0 : read_words * 2]
+                    ">" + "H" * temp, self.inbuf[temps[i] : temps[i+1]]
                 )
-                # print("<- (", read_words, ")", [hex(i) for i in outwords])
                 for i, w in enumerate(outwords):
                     buffer[offset + i] = w
-                offset += read_words
-                remainingWords -= read_words
-                addr += read_words
-        # print("i2c read", read_words, "words in", time.monotonic()-stamp)
-        # print("Read: ", [hex(i) for i in buffer[0:10]])
+                offset += temp
+                del outwords
+            
+            outwords = struct.unpack(
+                ">" + "H" * (read_words-9*temp), self.inbuf[temps[9] : read_words*2]
+            )
+            for i, w in enumerate(outwords):
+                buffer[offset + i] = w
+            offset += (read_words-9*temp)
+            del outwords
+            
+            remainingWords -= read_words
+            addr += read_words
