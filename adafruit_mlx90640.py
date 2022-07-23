@@ -2,7 +2,6 @@ import struct
 import math
 import time
 from machine import I2C
-import gc
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_MLX90640.git"
