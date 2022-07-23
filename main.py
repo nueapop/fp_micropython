@@ -11,7 +11,7 @@ time.sleep(1)
 
 while True:
     try:
-        mlx.getFrame(frame) # read MLX temperatures into frame var
+        mlx.getFrame(frame)
         print(frame) 
 
     except:
