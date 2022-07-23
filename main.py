@@ -17,4 +17,4 @@ while True:
     except:
         machine.reset()
     
-    time.sleep(0.5)
+    time.sleep(1)
