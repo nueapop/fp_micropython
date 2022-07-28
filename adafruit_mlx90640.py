@@ -280,8 +280,7 @@ class MLX90640:  # pylint: disable=too-many-instance-attributes
                 else:
                     torange = 3
 
-                To = int(
-                    math.sqrt(
+                To = math.sqrt(
                         math.sqrt(
                             irData
                             / (
@@ -291,9 +290,8 @@ class MLX90640:  # pylint: disable=too-many-instance-attributes
                             )
                             + taTr
                         )
-                    )
-                    - 273.15
-                )
+                    ) - 273.15
+                
 
                 result[pixelNumber] = To
 
