@@ -3,6 +3,7 @@
 ## Hardware Requirements
 - [Adafruit MLX90640](https://www.adafruit.com/product/4407)
 - [Adafruit AMG8833](https://www.adafruit.com/product/3538)
+- [MicroSD Card Adapter]()
 ## Firmware Download
 - [ESP32 Firmware](https://micropython.org/resources/firmware/esp32-20220618-v1.19.1.bin)
 ## Firmware Installation Instructions
