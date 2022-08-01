@@ -1,6 +1,3 @@
-import time
-from machine import I2C
-
 class AMG8833:
 
 	normal_mode  = 0x00
@@ -18,17 +15,16 @@ class AMG8833:
 		"""
 		self._i2c = i2c
 		self._addr = addr
+		"""
 		a = self._i2c.scan()
 		if not self._addr in a:
 			print("no device on selected address %02X!" % self._addr)
 		else:
 			print("device on address %02X available." % self._addr)
+		"""
 
 
 	def set_power_mode(self, mode):
-		"""
-
-		"""
 		b = bytes([mode])
 		self._i2c.writeto_mem(self._addr, 0x00, b)
 		return true

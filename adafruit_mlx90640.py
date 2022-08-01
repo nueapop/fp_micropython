@@ -1,7 +1,7 @@
 import struct
 import math
 import time
-from machine import I2C
+import machine
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_MLX90640.git"
@@ -61,7 +61,7 @@ class MLX90640:  # pylint: disable=too-many-instance-attributes
     cpKv = 0
 
     device_address = 0x33
-    i2c_device: I2C
+    i2c_device: machine.I2C
     inbuf = memoryview(bytearray(I2C_READ_LEN*2))
 
     def __init__(self, i2c_bus, address=0x33):
