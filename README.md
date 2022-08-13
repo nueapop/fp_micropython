@@ -5,8 +5,8 @@
 - [Adafruit AMG8833](https://www.adafruit.com/product/3538)
 - [MicroSD Card Adapter]()
 - [DHT22]()
-- [KY-022]()
-- [HX-53]() ( Fix Library )
+- [KY-022]() ( Fix Library )
+- [IR Transmitter]() ( Fix Library )
 - [Adafruit ST7735R](https://www.adafruit.com/product/358) ( Fix Library )
 - [SCT013]() ( Fix Library )
 ## Firmware Download
