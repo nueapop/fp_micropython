@@ -9,6 +9,7 @@
 - [IR Transmitter]() ( Fix Library )
 - [Adafruit ST7735R](https://www.adafruit.com/product/358) ( Fix Library )
 - [SCT013]() ( Fix Library )
+- [Infrared Remote Control]() ( Fix Library )
 ## Firmware Download
 - [ESP32 Firmware](https://micropython.org/resources/firmware/esp32-20220618-v1.19.1.bin)
 ## Firmware Installation Instructions
