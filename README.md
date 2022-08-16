@@ -6,7 +6,7 @@
 - [MicroSD Card Adapter]()
 - [DHT22]()
 - [KY-022]()
-- [IR Transmitter]() ( Fix Library )
+- [IR Transmitter]()
 - [Adafruit ST7735R](https://www.adafruit.com/product/358) ( Fix Library )
 - [SCT013]() ( Fix Library )
 - [Infrared Remote Control]() ( Fix Library )
