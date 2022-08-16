@@ -1,6 +1,7 @@
 #driver for Sainsmart 1.8" TFT display ST7735
 #Translated by Guy Carver from the ST7735 sample code.
-#Modirfied for micropython-esp32 by boochow 
+#Modirfied for micropython-esp32 by boochow
+#https://github.com/boochow/MicroPython-ST7735
 
 import machine
 import time
