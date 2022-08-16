@@ -7,7 +7,7 @@
 - [DHT22]()
 - [KY-022]()
 - [IR Transmitter]()
-- [Adafruit ST7735R](https://www.adafruit.com/product/358) ( Fix Library )
+- [Adafruit ST7735R](https://www.adafruit.com/product/358)
 - [SCT013]() ( Fix Library )
 - [Infrared Remote Control]() ( Fix Library )
 ## Firmware Download
