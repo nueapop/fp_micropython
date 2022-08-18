@@ -2,7 +2,7 @@ import time
 import machine
 import dht
 
-sensor = dht.DHT22(machine.Pin(4))
+sensor = dht.DHT22(machine.Pin(3))
 time.sleep(1)
 
 while True:
