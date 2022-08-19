@@ -32,6 +32,32 @@
   - MISO: D19
   - VCC: +5V
   - GND: GND
+
+- DHT22:
+  - VCC: +5V
+  - DATA: RX0
+  - GND: GND
+
+- KY-022:
+  - OUT: D35
+  - VCC: +5V
+  - GND: GND
+
+- IR Transmitter:
+  - DATA: TX2
+  - GND: GND
+
+- Adafruit ST7735R:
+  - BACKLIGHT: 3V3
+  - MISO: X
+  - SCK: D33
+  - MOSI: D32
+  - TFTCS: GND
+  - SDCS: X
+  - D/C: RX2
+  - RST: EN
+  - VCC: 3V3
+  - GND: GND
 #
 ## License
 
