@@ -24,6 +24,14 @@
   - GND: GND
   - SCL: D22
   - SDA: D21
+
+- MicroSD Card Adapter:
+  - CS: D5
+  - SCK: D18
+  - MOSI: D23
+  - MISO: D19
+  - VCC: +5V
+  - GND: GND
 #
 ## License
 
