@@ -15,6 +15,15 @@
 ## Firmware Installation Instructions
 - esptool --chip esp32 --port COM7 erase_flash
 - esptool --chip esp32 --port COM7 --baud 460800 write_flash -z 0x1000 esp32-20220618-v1.19.1.bin
+## Schematic
+![](https://raw.githubusercontent.com/nueapop/fp_micropython/main/assets/images/schematic.png)
+### Sensor Wire
+- Adafruit MLX90640:
+  - VIN: +5V
+  - 3VO: X
+  - GND: GND
+  - SCL: D22
+  - SDA: D21
 #
 ## License
 
