@@ -8,7 +8,7 @@ time.sleep(1)
 
 while True:
 	try:
-		print(amg.pixel())
+		print(amg.pixel()) 
 	
 	except:
 		machine.reset()
